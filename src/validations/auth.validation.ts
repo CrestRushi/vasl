@@ -1,27 +1,39 @@
-import * as yup from "yup";
+import { z } from "zod";
 
-export const loginSchema = yup.object({
-  email: yup.string().email("Enter a valid email").required("Email is required"),
-  password: yup.string().min(6, "At least 6 characters").required("Password is required"),
-});
-
-export const registerSchema = yup.object({
-  firstName: yup.string().required("First name is required"),
-  lastName: yup.string().required("Last name is required"),
-  email: yup.string().email("Enter a valid email").required("Email is required"),
-  password: yup
+export const loginSchema = z.object({
+  email: z
     .string()
-    .min(8, "Use at least 8 characters")
-    .required("Password is required"),
-});
-
-export const verifySchema = yup.object({
-  code: yup
+    .min(1, "Email is required")
+    .email({ message: "Enter a valid email" }),
+  password: z
     .string()
-    .length(6, "Enter the 6-digit code")
-    .required("Verification code is required"),
+    .min(1, "Password is required")
+    .min(6, "At least 6 characters"),
 });
 
-export const forgotPasswordSchema = yup.object({
-  email: yup.string().email("Enter a valid email").required("Email is required"),
+export const registerSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .email({ message: "Enter a valid email" }),
+  password: z
+    .string()
+    .min(1, "Password is required")
+    .min(8, "Use at least 8 characters"),
+});
+
+export const verifySchema = z.object({
+  code: z
+    .string()
+    .min(1, "Verification code is required")
+    .length(6, "Enter the 6-digit code"),
+});
+
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .email({ message: "Enter a valid email" }),
 });

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { verifySchema } from "@/validations/auth.validation";
 import { RHFOtpInput } from "@/components/form/RHFOtpInput";
 import { Button } from "@/components/ui/Button";
@@ -14,7 +14,7 @@ type FormValues = { code: string };
 export function VerifyScreen() {
   const router = useRouter();
   const methods = useForm<FormValues>({
-    resolver: yupResolver(verifySchema),
+    resolver: zodResolver(verifySchema),
     defaultValues: { code: "" },
   });
 

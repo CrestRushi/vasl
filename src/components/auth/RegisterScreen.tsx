@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema } from "@/validations/auth.validation";
 import { RHFInput } from "@/components/form/RHFInput";
 import { Button } from "@/components/ui/Button";
@@ -25,7 +25,7 @@ export function RegisterScreen() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const methods = useForm<FormValues>({
-    resolver: yupResolver(registerSchema),
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       firstName: "",
       lastName: "",

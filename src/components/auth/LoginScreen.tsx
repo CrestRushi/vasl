@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/validations/auth.validation";
 import { RHFInput } from "@/components/form/RHFInput";
 import { Button } from "@/components/ui/Button";
@@ -25,7 +25,7 @@ export function LoginScreen() {
   const next = search.get("next") || DEFAULT_LOGIN_REDIRECT;
 
   const methods = useForm<FormValues>({
-    resolver: yupResolver(loginSchema),
+    resolver: zodResolver(loginSchema),
     defaultValues: { email: "amara@azadihealth.com", password: "demo1234" },
   });
 

@@ -12,20 +12,8 @@ import { cn } from "@/lib/cn";
 
 const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] as const;
 
-export default function AvailabilityPage() {
-  const dispatch = useAppDispatch();
-  const onDemand = useAppSelector((s) => s.coach.onDemand);
-  const [toggles, setToggles] = useState<Record<string, boolean>>({
-    Monday: true,
-    Tuesday: true,
-    Wednesday: false,
-    Thursday: true,
-    Friday: true,
-    Saturday: false,
-    Sunday: false,
-  });
-
-  const Toggle = ({ on, onClick }: { on: boolean; onClick: () => void }) => (
+function AvailabilityToggle({ on, onClick }: { on: boolean; onClick: () => void }) {
+  return (
     <button
       type="button"
       onClick={onClick}
@@ -42,6 +30,20 @@ export default function AvailabilityPage() {
       />
     </button>
   );
+}
+
+export default function AvailabilityPage() {
+  const dispatch = useAppDispatch();
+  const onDemand = useAppSelector((s) => s.coach.onDemand);
+  const [toggles, setToggles] = useState<Record<string, boolean>>({
+    Monday: true,
+    Tuesday: true,
+    Wednesday: false,
+    Thursday: true,
+    Friday: true,
+    Saturday: false,
+    Sunday: false,
+  });
 
   return (
     <DashboardLayout title="Availability">
@@ -70,7 +72,7 @@ export default function AvailabilityPage() {
                   disabled={!on}
                   defaultValue={on ? "5:00 PM" : ""}
                 />
-                <Toggle on={on} onClick={() => setToggles((t) => ({ ...t, [day]: !t[day] }))} />
+                <AvailabilityToggle on={on} onClick={() => setToggles((t) => ({ ...t, [day]: !t[day] }))} />
               </div>
             );
           })}
@@ -97,7 +99,7 @@ export default function AvailabilityPage() {
               <div className="text-[13px] font-semibold">Available for on-demand sessions</div>
               <div className="text-xs text-dim">Users can request you immediately when active</div>
             </div>
-            <Toggle on={onDemand} onClick={() => dispatch(setOnDemand(!onDemand))} />
+            <AvailabilityToggle on={onDemand} onClick={() => dispatch(setOnDemand(!onDemand))} />
           </div>
         </Card>
       </div>

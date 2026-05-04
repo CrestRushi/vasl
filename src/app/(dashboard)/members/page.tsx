@@ -1,19 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { TableWrap } from "@/components/ui/Table";
 import { TableToolbar } from "@/components/tables/TableToolbar";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
-import { userService } from "@/services/user.service";
-import type { PlatformUser } from "@/types/user";
+import { useUsersQuery } from "@/hooks/api/use-users";
 
 export default function OrgMembersPage() {
-  const [users, setUsers] = useState<PlatformUser[]>([]);
-  useEffect(() => {
-    userService.list().then(setUsers);
-  }, []);
+  const { data: users = [], isPending } = useUsersQuery();
 
   return (
     <DashboardLayout title="Member Management">
@@ -35,7 +30,14 @@ export default function OrgMembersPage() {
             </tr>
           </thead>
           <tbody>
-            {users.map((u) => (
+            {isPending ? (
+              <tr>
+                <td colSpan={6} className="px-[22px] py-8 text-center text-sm text-mid">
+                  Loading members…
+                </td>
+              </tr>
+            ) : (
+              users.map((u) => (
               <tr key={u.id} className="group">
                 <td className="border-b border-[rgba(60,50,40,0.08)] px-[22px] py-[13px] group-hover:bg-[#EDE7DC]">
                   <div className="font-semibold">{u.name}</div>
@@ -59,7 +61,8 @@ export default function OrgMembersPage() {
                   </Badge>
                 </td>
               </tr>
-            ))}
+              ))
+            )}
           </tbody>
         </table>
       </TableWrap>

@@ -1,8 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useAppDispatch } from "@/hooks/redux";
-import { switchRoleThunk } from "@/store/slices/authSlice";
+import { useSwitchRoleMutation } from "@/hooks/api/use-auth-mutations";
 import type { Role } from "@/types/role";
 import { toast } from "sonner";
 
@@ -51,12 +50,12 @@ const cards: {
 ];
 
 export function RoleGate() {
-  const dispatch = useAppDispatch();
+  const switchRole = useSwitchRoleMutation();
   const router = useRouter();
 
   const enter = async (role: Role) => {
     try {
-      await dispatch(switchRoleThunk({ role })).unwrap();
+      await switchRole.mutateAsync({ role });
       toast.success(`Entering as ${role}`);
       router.push("/dashboard");
     } catch {
@@ -84,11 +83,12 @@ export function RoleGate() {
             <button
               key={c.role}
               type="button"
+              disabled={switchRole.isPending}
               onClick={() => enter(c.role)}
               className={
                 c.full
-                  ? "group col-span-1 flex cursor-pointer items-start gap-7 overflow-hidden rounded-[20px] border-[1.5px] border-[rgba(60,50,40,0.1)] bg-card p-8 text-left transition-all hover:-translate-y-0.5 hover:border-[rgba(60,50,40,0.22)] hover:shadow-[0_8px_32px_rgba(60,50,40,0.12)] md:col-span-2 md:flex-row md:items-center"
-                  : "group cursor-pointer rounded-[20px] border-[1.5px] border-[rgba(60,50,40,0.1)] bg-card p-8 text-left transition-all hover:-translate-y-0.5 hover:border-[rgba(60,50,40,0.22)] hover:shadow-[0_8px_32px_rgba(60,50,40,0.12)]"
+                  ? "group col-span-1 flex cursor-pointer items-start gap-7 overflow-hidden rounded-[20px] border-[1.5px] border-[rgba(60,50,40,0.1)] bg-card p-8 text-left transition-all hover:-translate-y-0.5 hover:border-[rgba(60,50,40,0.22)] hover:shadow-[0_8px_32px_rgba(60,50,40,0.12)] disabled:pointer-events-none disabled:opacity-60 md:col-span-2 md:flex-row md:items-center"
+                  : "group cursor-pointer rounded-[20px] border-[1.5px] border-[rgba(60,50,40,0.1)] bg-card p-8 text-left transition-all hover:-translate-y-0.5 hover:border-[rgba(60,50,40,0.22)] hover:shadow-[0_8px_32px_rgba(60,50,40,0.12)] disabled:pointer-events-none disabled:opacity-60"
               }
             >
               <div className={c.full ? "text-[44px] leading-none" : "mb-3.5 text-[38px]"}>

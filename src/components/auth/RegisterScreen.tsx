@@ -10,8 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Label } from "@/components/ui/Label";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Controller } from "react-hook-form";
-import { useAppDispatch } from "@/hooks/redux";
-import { registerThunk } from "@/store/slices/authSlice";
+import { useRegisterMutation } from "@/hooks/api/use-auth-mutations";
 import { toast } from "sonner";
 
 type FormValues = {
@@ -22,7 +21,7 @@ type FormValues = {
 };
 
 export function RegisterScreen() {
-  const dispatch = useAppDispatch();
+  const registerMutation = useRegisterMutation();
   const router = useRouter();
   const methods = useForm<FormValues>({
     resolver: zodResolver(registerSchema),
@@ -36,11 +35,11 @@ export function RegisterScreen() {
 
   const onSubmit = methods.handleSubmit(async (data) => {
     try {
-      await dispatch(registerThunk(data)).unwrap();
+      await registerMutation.mutateAsync(data);
       toast.success("Account created");
       router.push("/verify");
     } catch (e) {
-      toast.error(String(e));
+      toast.error(e instanceof Error ? e.message : "Registration failed");
     }
   });
 
@@ -125,7 +124,7 @@ export function RegisterScreen() {
                 )}
               />
             </div>
-            <Button type="submit" size="lg" fullWidth className="mt-2">
+            <Button type="submit" size="lg" fullWidth className="mt-2" disabled={registerMutation.isPending}>
               Create Account →
             </Button>
             <div className="my-4 flex items-center gap-3 text-xs text-dim">

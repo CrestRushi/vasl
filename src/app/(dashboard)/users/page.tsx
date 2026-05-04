@@ -10,14 +10,14 @@ import { TableToolbar } from "@/components/tables/TableToolbar";
 import { TableFilters } from "@/components/tables/TableFilters";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import users from "@/mock/users.json";
 import type { PlatformUser } from "@/types/user";
 import { useState } from "react";
+import { useUsersQuery } from "@/hooks/api/use-users";
 
 const col = createColumnHelper<PlatformUser>();
 
 export default function AdminUsersPage() {
-  const data = users as PlatformUser[];
+  const { data: data = [], isPending } = useUsersQuery();
   const [q, setQ] = useState("");
   const filtered = useMemo(
     () =>
@@ -112,7 +112,11 @@ export default function AdminUsersPage() {
           <TableToolbar title="All Users (1,714)">
             <TableFilters searchPlaceholder="Search users..." value={q} onChange={setQ} />
           </TableToolbar>
-          <DataTable data={filtered} columns={columns} pageSize={8} />
+          {isPending ? (
+            <p className="px-[22px] py-8 text-center text-sm text-mid">Loading users…</p>
+          ) : (
+            <DataTable data={filtered} columns={columns} pageSize={8} />
+          )}
         </TableWrap>
       </div>
     </DashboardLayout>

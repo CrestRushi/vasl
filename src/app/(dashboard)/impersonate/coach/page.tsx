@@ -2,18 +2,17 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAppDispatch } from "@/hooks/redux";
-import { switchRoleThunk } from "@/store/slices/authSlice";
+import { useSwitchRoleMutation } from "@/hooks/api/use-auth-mutations";
 import { toast } from "sonner";
 
 export default function ImpersonateCoachPage() {
-  const dispatch = useAppDispatch();
+  const { mutateAsync: switchRoleAsync } = useSwitchRoleMutation();
   const router = useRouter();
 
   useEffect(() => {
-    (async () => {
+    void (async () => {
       try {
-        await dispatch(switchRoleThunk({ role: "coach" })).unwrap();
+        await switchRoleAsync({ role: "coach" });
         toast.message("Viewing as Coach");
         router.replace("/dashboard");
       } catch {
@@ -21,7 +20,7 @@ export default function ImpersonateCoachPage() {
         router.replace("/dashboard");
       }
     })();
-  }, [dispatch, router]);
+  }, [router, switchRoleAsync]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-canvas text-mid">

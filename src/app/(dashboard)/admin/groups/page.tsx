@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { TableWrap } from "@/components/ui/Table";
 import { TableToolbar } from "@/components/tables/TableToolbar";
@@ -10,9 +10,8 @@ import { BaseModal } from "@/components/modals/BaseModal";
 import { Label } from "@/components/ui/Label";
 import { Input } from "@/components/ui/Input";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { setAdminGroups, addAdminGroup } from "@/store/slices/adminSlice";
 import { closeModal, openModal } from "@/store/slices/uiSlice";
-import { adminService } from "@/services/admin.service";
+import { useAdminGroupsQuery, useAppendAdminGroupMutation } from "@/hooks/api/use-admin";
 import type { CommunityGroup } from "@/types/group";
 import { cn } from "@/lib/cn";
 import { toast } from "sonner";
@@ -21,17 +20,12 @@ const EMOJIS = ["🌿", "🌈", "📚", "🧘", "✊🏾", "🌍", "💚", "🦋
 
 export default function AdminGroupsPage() {
   const dispatch = useAppDispatch();
-  const groups = useAppSelector((s) => s.admin.groups);
+  const { data: groups = [], isPending } = useAdminGroupsQuery();
+  const appendGroup = useAppendAdminGroupMutation();
   const modal = useAppSelector((s) => s.ui.modal);
   const [gname, setGname] = useState("");
   const [tags, setTags] = useState("");
   const [emoji, setEmoji] = useState("🌿");
-
-  useEffect(() => {
-    if (!groups.length) {
-      adminService.getGroups().then((g) => dispatch(setAdminGroups(g)));
-    }
-  }, [groups.length, dispatch]);
 
   const submit = () => {
     if (!gname.trim()) {
@@ -51,7 +45,7 @@ export default function AdminGroupsPage() {
       mod: "Admin",
       status: "active",
     };
-    dispatch(addAdminGroup(g));
+    appendGroup.mutate(g);
     dispatch(closeModal());
     setGname("");
     setTags("");
@@ -84,36 +78,44 @@ export default function AdminGroupsPage() {
               </tr>
             </thead>
             <tbody>
-              {groups.map((g) => (
-                <tr key={g.id} className="group">
-                  <td className="border-b border-[rgba(60,50,40,0.08)] px-[22px] py-[13px] group-hover:bg-[#EDE7DC]">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl">{g.emoji}</span>
-                      <span className="font-semibold">{g.name}</span>
-                    </div>
-                  </td>
-                  <td className="border-b border-[rgba(60,50,40,0.08)] px-[22px] py-[13px] group-hover:bg-[#EDE7DC]">
-                    {g.members}
-                  </td>
-                  <td className="border-b border-[rgba(60,50,40,0.08)] px-[22px] py-[13px] group-hover:bg-[#EDE7DC]">
-                    {g.posts}
-                  </td>
-                  <td className="border-b border-[rgba(60,50,40,0.08)] px-[22px] py-[13px] text-sm text-mid group-hover:bg-[#EDE7DC]">
-                    {g.mod}
-                  </td>
-                  <td className="border-b border-[rgba(60,50,40,0.08)] px-[22px] py-[13px] group-hover:bg-[#EDE7DC]">
-                    <Badge variant={g.status === "active" ? "sage" : "gold"}>{g.status}</Badge>
-                  </td>
-                  <td className="border-b border-[rgba(60,50,40,0.08)] px-[22px] py-[13px] group-hover:bg-[#EDE7DC]">
-                    <Button variant="ghost" size="xs" type="button" className="mr-1">
-                      Edit
-                    </Button>
-                    <Button variant="ghost" size="xs" type="button" className="text-danger">
-                      Archive
-                    </Button>
+              {isPending ? (
+                <tr>
+                  <td colSpan={6} className="px-[22px] py-8 text-center text-sm text-mid">
+                    Loading groups…
                   </td>
                 </tr>
-              ))}
+              ) : (
+                groups.map((g) => (
+                  <tr key={g.id} className="group">
+                    <td className="border-b border-[rgba(60,50,40,0.08)] px-[22px] py-[13px] group-hover:bg-[#EDE7DC]">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl">{g.emoji}</span>
+                        <span className="font-semibold">{g.name}</span>
+                      </div>
+                    </td>
+                    <td className="border-b border-[rgba(60,50,40,0.08)] px-[22px] py-[13px] group-hover:bg-[#EDE7DC]">
+                      {g.members}
+                    </td>
+                    <td className="border-b border-[rgba(60,50,40,0.08)] px-[22px] py-[13px] group-hover:bg-[#EDE7DC]">
+                      {g.posts}
+                    </td>
+                    <td className="border-b border-[rgba(60,50,40,0.08)] px-[22px] py-[13px] text-sm text-mid group-hover:bg-[#EDE7DC]">
+                      {g.mod}
+                    </td>
+                    <td className="border-b border-[rgba(60,50,40,0.08)] px-[22px] py-[13px] group-hover:bg-[#EDE7DC]">
+                      <Badge variant={g.status === "active" ? "sage" : "gold"}>{g.status}</Badge>
+                    </td>
+                    <td className="border-b border-[rgba(60,50,40,0.08)] px-[22px] py-[13px] group-hover:bg-[#EDE7DC]">
+                      <Button variant="ghost" size="xs" type="button" className="mr-1">
+                        Edit
+                      </Button>
+                      <Button variant="ghost" size="xs" type="button" className="text-danger">
+                        Archive
+                      </Button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </TableWrap>

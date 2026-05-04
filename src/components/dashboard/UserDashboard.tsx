@@ -5,9 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { StatsCard } from "@/components/cards/StatsCard";
 import { useAppSelector } from "@/hooks/redux";
-import { coachService } from "@/services/coach.service";
-import { useEffect, useState } from "react";
-import type { Coach } from "@/types/coach";
+import { useCoachesQuery } from "@/hooks/api/use-coaches";
 import groups from "@/mock/groups.json";
 import type { CommunityGroup } from "@/types/group";
 
@@ -20,12 +18,8 @@ const QUICK_ACCESS = [
 export function UserDashboard() {
   const user = useAppSelector((s) => s.auth.user);
   const name = user?.firstName ?? "Amara";
-  const [coaches, setCoaches] = useState<Coach[]>([]);
+  const { data: coaches = [] } = useCoachesQuery();
   const joined = (groups as CommunityGroup[]).filter((g) => g.joined);
-
-  useEffect(() => {
-    coachService.list().then(setCoaches);
-  }, []);
 
   return (
     <div className="animate-fadeIn">

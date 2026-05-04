@@ -1,18 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card } from "@/components/ui/Card";
 import { ActivityCardRow } from "@/components/cards/ActivityCard";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
-import { adminService, type ActivityItem } from "@/services/admin.service";
+import { useActivityQuery } from "@/hooks/api/use-admin";
 
 export default function ActivityPage() {
-  const [items, setItems] = useState<ActivityItem[]>([]);
-  useEffect(() => {
-    adminService.getActivity().then((a) => setItems([...a, ...a]));
-  }, []);
+  const { data: activity = [], isPending } = useActivityQuery();
+  const items = useMemo(() => [...activity, ...activity], [activity]);
 
   return (
     <DashboardLayout title="Activity Log">
@@ -37,9 +35,11 @@ export default function ActivityPage() {
             </Button>
           </div>
         </div>
-        {items.map((a, i) => (
-          <ActivityCardRow key={i} {...a} />
-        ))}
+        {isPending ? (
+          <p className="text-sm text-mid">Loading activity…</p>
+        ) : (
+          items.map((a, i) => <ActivityCardRow key={i} {...a} />)
+        )}
       </Card>
     </DashboardLayout>
   );

@@ -1,17 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { CoachCard } from "@/components/cards/CoachCard";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { coachService } from "@/services/coach.service";
-import type { Coach } from "@/types/coach";
+import { useCoachesQuery } from "@/hooks/api/use-coaches";
+
 export default function OrgCoachesPage() {
-  const [coaches, setCoaches] = useState<Coach[]>([]);
-  useEffect(() => {
-    coachService.list().then(setCoaches);
-  }, []);
+  const { data: allCoaches = [] } = useCoachesQuery();
+  const coaches = useMemo(() => allCoaches.slice(0, 4), [allCoaches]);
 
   return (
     <DashboardLayout title="Our Coaches">

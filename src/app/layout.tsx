@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Nunito, JetBrains_Mono } from "next/font/google";
 import { StoreProvider } from "@/store/provider";
+import { QueryProvider } from "@/providers/QueryProvider";
 import { AuthHydrator } from "@/components/auth/AuthHydrator";
 import { NavigationProgress } from "@/components/layout/NavigationProgress";
 import { Toaster } from "sonner";
@@ -51,10 +52,12 @@ export default function RootLayout({
       */}
       <body suppressHydrationWarning>
         <StoreProvider>
-          <NavigationProgress />
-          <AuthHydrator />
-          {children}
-          <Toaster richColors position="top-center" />
+          <QueryProvider>
+            <NavigationProgress />
+            <AuthHydrator />
+            {children}
+            <Toaster richColors position="top-center" />
+          </QueryProvider>
         </StoreProvider>
       </body>
     </html>

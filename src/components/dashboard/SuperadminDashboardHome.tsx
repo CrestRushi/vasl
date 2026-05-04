@@ -1,13 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Card } from "@/components/ui/Card";
 import { StatsCard } from "@/components/cards/StatsCard";
 import { ActivityCardRow } from "@/components/cards/ActivityCard";
-import { adminService } from "@/services/admin.service";
-import type { ActivityItem } from "@/services/admin.service";
+import { useActivityQuery } from "@/hooks/api/use-admin";
+import { useOrganizationsQuery } from "@/hooks/api/use-organizations";
 import groups from "@/mock/groups.json";
-import orgs from "@/mock/organizations.json";
 import type { CommunityGroup } from "@/types/group";
 
 const chartData = [
@@ -16,10 +15,8 @@ const chartData = [
 ];
 
 export function SuperadminDashboardHome() {
-  const [activity, setActivity] = useState<ActivityItem[]>([]);
-  useEffect(() => {
-    adminService.getActivity().then(setActivity);
-  }, []);
+  const { data: activity = [] } = useActivityQuery();
+  const { data: orgs = [] } = useOrganizationsQuery();
 
   const bars = useMemo(() => {
     const max = Math.max(...chartData);

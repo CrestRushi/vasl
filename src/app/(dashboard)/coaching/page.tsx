@@ -1,18 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { CoachCard } from "@/components/cards/CoachCard";
-import { coachService } from "@/services/coach.service";
-import type { Coach } from "@/types/coach";
+import { useCoachesQuery } from "@/hooks/api/use-coaches";
 
 export default function CoachingPage() {
   const router = useRouter();
-  const [coaches, setCoaches] = useState<Coach[]>([]);
-  useEffect(() => {
-    coachService.list().then(setCoaches);
-  }, []);
+  const { data: coaches = [] } = useCoachesQuery();
 
   return (
     <DashboardLayout title="Coaching">

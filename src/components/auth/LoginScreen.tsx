@@ -9,17 +9,15 @@ import { RHFInput } from "@/components/form/RHFInput";
 import { Button } from "@/components/ui/Button";
 import { Label } from "@/components/ui/Label";
 import { PasswordInput } from "@/components/ui/PasswordInput";
-import { useAppDispatch } from "@/hooks/redux";
-import { loginThunk, clearError } from "@/store/slices/authSlice";
+import { useLoginMutation } from "@/hooks/api/use-auth-mutations";
 import { toast } from "sonner";
-import { useEffect } from "react";
-import { DEFAULT_LOGIN_REDIRECT } from "@/constants/routes";
 import { Controller } from "react-hook-form";
+import { DEFAULT_LOGIN_REDIRECT } from "@/constants/routes";
 
 type FormValues = { email: string; password: string };
 
 export function LoginScreen() {
-  const dispatch = useAppDispatch();
+  const login = useLoginMutation();
   const router = useRouter();
   const search = useSearchParams();
   const next = search.get("next") || DEFAULT_LOGIN_REDIRECT;
@@ -29,17 +27,13 @@ export function LoginScreen() {
     defaultValues: { email: "amara@azadihealth.com", password: "demo1234" },
   });
 
-  useEffect(() => {
-    dispatch(clearError());
-  }, [dispatch]);
-
   const onSubmit = methods.handleSubmit(async (data) => {
     try {
-      await dispatch(loginThunk(data)).unwrap();
+      await login.mutateAsync(data);
       toast.success("Welcome back");
       router.push(next);
     } catch (e) {
-      toast.error(String(e));
+      toast.error(e instanceof Error ? e.message : "Login failed");
     }
   });
 
@@ -111,7 +105,7 @@ export function LoginScreen() {
             >
               Forgot password?
             </Link>
-            <Button type="submit" size="lg" fullWidth disabled={methods.formState.isSubmitting}>
+            <Button type="submit" size="lg" fullWidth disabled={login.isPending}>
               Sign In →
             </Button>
             <div className="my-4 flex items-center gap-3 text-xs text-dim">

@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { coachService } from "@/services/coach.service";
+import { useCoachQuery } from "@/hooks/api/use-coaches";
 import type { Coach } from "@/types/coach";
 import moods from "@/mock/moods.json";
 import type { MoodOption } from "@/types/mood";
@@ -34,15 +34,12 @@ export default function CoachingChatPage() {
   const search = useSearchParams();
   const bookOnly = search.get("book") === "1";
   const coachId = Number(params.coachId);
-  const [coach, setCoach] = useState<Coach | null>(null);
+  const { data: coachData, isPending: coachLoading } = useCoachQuery(coachId);
+  const coach: Coach | null = coachData ?? null;
   const [msgs, setMsgs] = useState(initialMsgs);
   const [input, setInput] = useState("");
   const [selSlot, setSelSlot] = useState<string | null>(null);
   const [booked, setBooked] = useState(false);
-
-  useEffect(() => {
-    coachService.getById(coachId).then((c) => setCoach(c ?? null));
-  }, [coachId]);
 
   const send = () => {
     const t = input.trim();
@@ -122,10 +119,18 @@ export default function CoachingChatPage() {
     </Card>
   ) : null;
 
-  if (!coach) {
+  if (coachLoading) {
     return (
       <DashboardLayout title="Coaching">
         <p className="text-mid">Loading…</p>
+      </DashboardLayout>
+    );
+  }
+
+  if (!coach) {
+    return (
+      <DashboardLayout title="Coaching">
+        <p className="text-mid">Coach not found.</p>
       </DashboardLayout>
     );
   }

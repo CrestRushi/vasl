@@ -6,11 +6,10 @@ import { TableWrap } from "@/components/ui/Table";
 import { TableToolbar } from "@/components/tables/TableToolbar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import orgs from "@/mock/organizations.json";
-import type { Organization } from "@/types/organization";
+import { useOrganizationsQuery } from "@/hooks/api/use-organizations";
 
 export default function AdminOrganizationsPage() {
-  const rows = orgs as Organization[];
+  const { data: rows = [], isPending } = useOrganizationsQuery();
   return (
     <DashboardLayout title="Client Organizations">
       <div className="animate-fadeIn">
@@ -49,7 +48,14 @@ export default function AdminOrganizationsPage() {
               </tr>
             </thead>
             <tbody>
-              {rows.map((o) => (
+              {isPending ? (
+                <tr>
+                  <td colSpan={8} className="px-[22px] py-8 text-center text-sm text-mid">
+                    Loading organizations…
+                  </td>
+                </tr>
+              ) : (
+                rows.map((o) => (
                 <tr key={o.id} className="group">
                   <td className="border-b border-[rgba(60,50,40,0.08)] px-[22px] py-[13px] group-hover:bg-[#EDE7DC]">
                     <div className="font-semibold">{o.name}</div>
@@ -92,7 +98,8 @@ export default function AdminOrganizationsPage() {
                     </Button>
                   </td>
                 </tr>
-              ))}
+              ))
+              )}
             </tbody>
           </table>
         </TableWrap>

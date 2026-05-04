@@ -1,20 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { TableWrap } from "@/components/ui/Table";
 import { TableToolbar } from "@/components/tables/TableToolbar";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { userService } from "@/services/user.service";
-import type { PlatformUser } from "@/types/user";
+import { useUsersQuery } from "@/hooks/api/use-users";
 
 export default function CoachClientsPage() {
-  const [users, setUsers] = useState<PlatformUser[]>([]);
-  useEffect(() => {
-    userService.list().then((u) => setUsers(u.slice(0, 4)));
-  }, []);
+  const { data: allUsers = [] } = useUsersQuery();
+  const users = useMemo(() => allUsers.slice(0, 4), [allUsers]);
 
   return (
     <DashboardLayout title="My Clients">

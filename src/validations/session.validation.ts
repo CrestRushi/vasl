@@ -1,13 +1,21 @@
-import * as yup from "yup";
+import { z } from "zod";
 
-export const bookSessionSchema = yup.object({
-  coachId: yup.number().required(),
-  slot: yup.string().required("Select a time"),
+export const bookSessionSchema = z.object({
+  coachId: z.preprocess(
+    (val) => {
+      if (val === "" || val === null || val === undefined) return undefined;
+      if (typeof val === "number") return val;
+      const n = Number(val);
+      return Number.isFinite(n) ? n : val;
+    },
+    z.number({ required_error: "Required", invalid_type_error: "Required" }),
+  ),
+  slot: z.string().min(1, "Select a time"),
 });
 
-export const sessionNoteSchema = yup.object({
-  clientId: yup.string().required(),
-  sessionType: yup.string().required(),
-  notes: yup.string().min(1, "Add session notes").required(),
-  nextGoal: yup.string().optional(),
+export const sessionNoteSchema = z.object({
+  clientId: z.string().min(1),
+  sessionType: z.string().min(1),
+  notes: z.string().min(1, "Add session notes"),
+  nextGoal: z.string().optional(),
 });

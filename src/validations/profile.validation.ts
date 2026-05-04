@@ -1,7 +1,7 @@
-import * as yup from "yup";
+import { z } from "zod";
 
-export const profileSchema = yup.object({
-  firstName: yup.string().required(),
-  lastName: yup.string().required(),
-  email: yup.string().email().required(),
+export const profileSchema = z.object({
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+  email: z.string().min(1).email(),
 });

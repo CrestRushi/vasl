@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { FormProvider, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { forgotPasswordSchema } from "@/validations/auth.validation";
 import { RHFInput } from "@/components/form/RHFInput";
 import { Button } from "@/components/ui/Button";
@@ -13,7 +13,7 @@ type FormValues = { email: string };
 
 export function ForgotPasswordScreen() {
   const methods = useForm<FormValues>({
-    resolver: yupResolver(forgotPasswordSchema),
+    resolver: zodResolver(forgotPasswordSchema),
     defaultValues: { email: "" },
   });
 

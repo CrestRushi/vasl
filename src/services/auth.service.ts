@@ -55,8 +55,16 @@ export const authService = {
       email: payload.email.trim().toLowerCase(),
       firstName: payload.firstName,
       lastName: payload.lastName,
-      role: "user",
-      avatarEmoji: "🌿",
+      role: payload.role ?? "user",
+      organizationId: payload.role === "organization" ? `org-${Date.now()}` : undefined,
+      avatarEmoji:
+        payload.role === "coach"
+          ? "CO"
+          : payload.role === "organization"
+            ? "OR"
+            : payload.role === "superadmin"
+              ? "SA"
+              : "ME",
     };
     return {
       token: buildToken(user.id),

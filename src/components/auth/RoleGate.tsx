@@ -1,9 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useSwitchRoleMutation } from "@/hooks/api/use-auth-mutations";
 import type { Role } from "@/types/role";
-import { toast } from "sonner";
 
 const cards: {
   role: Role;
@@ -50,17 +48,10 @@ const cards: {
 ];
 
 export function RoleGate() {
-  const switchRole = useSwitchRoleMutation();
   const router = useRouter();
 
-  const enter = async (role: Role) => {
-    try {
-      await switchRole.mutateAsync({ role });
-      toast.success(`Entering as ${role}`);
-      router.push("/dashboard");
-    } catch {
-      toast.error("Could not switch role");
-    }
+  const enter = (role: Role) => {
+    router.push(`/login?role=${role}`);
   };
 
   return (
@@ -83,7 +74,6 @@ export function RoleGate() {
             <button
               key={c.role}
               type="button"
-              disabled={switchRole.isPending}
               onClick={() => enter(c.role)}
               className={
                 c.full

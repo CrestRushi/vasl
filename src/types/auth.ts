@@ -26,4 +26,10 @@ export interface RegisterPayload {
   lastName: string;
   email: string;
   password: string;
+  role?: Role;
+  organizationName?: string;
+  organizationType?: string;
+  licenseNumber?: string;
+  specialties?: string;
+  adminCode?: string;
 }

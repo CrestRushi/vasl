@@ -13,6 +13,7 @@ import { useLoginMutation } from "@/hooks/api/use-auth-mutations";
 import { toast } from "sonner";
 import { Controller } from "react-hook-form";
 import { DEFAULT_LOGIN_REDIRECT } from "@/constants/routes";
+import { getAuthRoleOption, parseAuthRole } from "@/lib/auth-roles";
 
 type FormValues = { email: string; password: string };
 
@@ -21,10 +22,12 @@ export function LoginScreen() {
   const router = useRouter();
   const search = useSearchParams();
   const next = search.get("next") || DEFAULT_LOGIN_REDIRECT;
+  const role = parseAuthRole(search.get("role"));
+  const roleOption = getAuthRoleOption(role);
 
   const methods = useForm<FormValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "amara@azadihealth.com", password: "demo1234" },
+    defaultValues: { email: roleOption.loginEmail, password: "demo1234" },
   });
 
   const onSubmit = methods.handleSubmit(async (data) => {
@@ -59,7 +62,7 @@ export function LoginScreen() {
         </div>
         <div className="relative z-[1] mt-[52px]">
           <h2 className="max-w-lg font-serif text-[28px] font-normal italic leading-snug text-[#FDFAF5]/80">
-            &quot;Healing is not linear — but you don&apos;t have to walk the path alone.&quot;
+            &quot;Healing is not linear, but you don&apos;t have to walk the path alone.&quot;
           </h2>
         </div>
         <ul className="relative z-[1] mt-11 space-y-3 text-[13.5px] text-[#FDFAF5]/60">
@@ -70,7 +73,7 @@ export function LoginScreen() {
             "Available 7 days a week",
           ].map((f) => (
             <li key={f} className="flex items-center gap-2.5">
-              <span className="text-sage-light">✓</span>
+              <span className="text-sage-light">OK</span>
               {f}
             </li>
           ))}
@@ -80,7 +83,9 @@ export function LoginScreen() {
         <FormProvider {...methods}>
           <form onSubmit={onSubmit} className="w-full animate-fadeIn">
             <h3 className="mb-1 font-serif text-[28px] font-semibold text-ink">Welcome Back</h3>
-            <p className="mb-7 text-[13.5px] text-mid">Sign in to continue your journey</p>
+            <p className="mb-7 text-[13.5px] text-mid">
+              Sign in to continue as {roleOption.label}
+            </p>
             <div className="mb-4">
               <Label htmlFor="email">Email</Label>
               <RHFInput name="email" placeholder="you@example.com" />
@@ -106,7 +111,7 @@ export function LoginScreen() {
               Forgot password?
             </Link>
             <Button type="submit" size="lg" fullWidth disabled={login.isPending}>
-              Sign In →
+              Sign In -&gt;
             </Button>
             <div className="my-4 flex items-center gap-3 text-xs text-dim">
               <span className="h-px flex-1 bg-line" />
@@ -115,7 +120,10 @@ export function LoginScreen() {
             </div>
             <p className="text-center text-sm text-mid">
               New to Azadi?{" "}
-              <Link href="/register" className="font-bold text-sage hover:underline">
+              <Link
+                href={`/register?role=${role}`}
+                className="font-bold text-sage hover:underline"
+              >
                 Create account
               </Link>
             </p>
